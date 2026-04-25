@@ -1,0 +1,17 @@
+[
+  {
+    "id": 1,
+    "question": "What is a hash table?",
+    "difficulty": "easy"
+  },
+  {
+    "id": 2,
+    "question": "Explain quicksort time complexity.",
+    "difficulty": "medium"
+  },
+  {
+    "id": 3,
+    "question": "Design a URL shortener system.",
+    "difficulty": "hard"
+  }
+]
