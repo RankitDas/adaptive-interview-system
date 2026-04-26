@@ -1,0 +1,162 @@
+"use client";
+
+import { KeyboardEvent } from "react";
+import { CompileResponse } from "../types";
+import Button from "./ui/Button";
+import Card from "./ui/Card";
+
+type CodingWorkspaceProps = {
+  code: string;
+  explanation: string;
+  stdin: string;
+  compileResult: CompileResponse | null;
+  isCompiling: boolean;
+  isSubmitting: boolean;
+  lineCount: number;
+  onCodeChange: (value: string) => void;
+  onCompile: () => void;
+  onExplanationChange: (value: string) => void;
+  onPasteBlocked: () => void;
+  onStdinChange: (value: string) => void;
+  onSubmit: () => void;
+};
+
+export default function CodingWorkspace({
+  code,
+  explanation,
+  stdin,
+  compileResult,
+  isCompiling,
+  isSubmitting,
+  lineCount,
+  onCodeChange,
+  onCompile,
+  onExplanationChange,
+  onPasteBlocked,
+  onStdinChange,
+  onSubmit,
+}: CodingWorkspaceProps) {
+  function blockPasteShortcut(event: KeyboardEvent<HTMLTextAreaElement>) {
+    const isPasteShortcut =
+      ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "v")
+      || (event.shiftKey && event.key === "Insert");
+
+    if (!isPasteShortcut) {
+      return;
+    }
+
+    event.preventDefault();
+    onPasteBlocked();
+  }
+
+  return (
+    <Card className="answer-box fade-up">
+      <div className="section-heading">
+        <div>
+          <span className="eyebrow">Coding round</span>
+          <h3>C compiler workspace</h3>
+        </div>
+
+        <div className="prompt-meta">
+          <span className="tone-badge">C language</span>
+          <span className="tone-badge">{lineCount} code lines</span>
+        </div>
+      </div>
+
+      <textarea
+        className="code-editor"
+        spellCheck={false}
+        value={code}
+        onChange={(event) => onCodeChange(event.target.value)}
+        onDrop={(event) => {
+          event.preventDefault();
+          onPasteBlocked();
+        }}
+        onKeyDown={blockPasteShortcut}
+        onPaste={(event) => {
+          event.preventDefault();
+          onPasteBlocked();
+        }}
+      />
+
+      <div className="coding-grid">
+        <div className="coding-side-panel">
+          <label className="field-label" htmlFor="stdin-input">
+            Program input
+          </label>
+          <textarea
+            id="stdin-input"
+            className="mini-textarea"
+            placeholder="Optional stdin for your program..."
+            value={stdin}
+            onChange={(event) => onStdinChange(event.target.value)}
+          />
+        </div>
+
+        <div className="coding-side-panel">
+          <label className="field-label" htmlFor="explanation-input">
+            Explain your approach
+          </label>
+          <textarea
+            id="explanation-input"
+            className="mini-textarea"
+            placeholder="Describe the approach, time complexity, and edge cases..."
+            value={explanation}
+            onChange={(event) => onExplanationChange(event.target.value)}
+            onDrop={(event) => {
+              event.preventDefault();
+              onPasteBlocked();
+            }}
+            onKeyDown={blockPasteShortcut}
+            onPaste={(event) => {
+              event.preventDefault();
+              onPasteBlocked();
+            }}
+          />
+        </div>
+      </div>
+
+      <div className="compiler-actions">
+        <Button onClick={onCompile} disabled={!code.trim() || isCompiling} type="button">
+          {isCompiling ? "Compiling..." : "Compile & run"}
+        </Button>
+        <Button
+          onClick={onSubmit}
+          disabled={!code.trim() || isSubmitting}
+          type="button"
+          variant="success"
+        >
+          {isSubmitting ? "Submitting..." : "Submit coding answer"}
+        </Button>
+      </div>
+
+      <div className="compiler-panel">
+        <div>
+          <span className="eyebrow">Compiler status</span>
+          <strong className={compileResult?.compiled_successfully ? "status-good" : "status-warn"}>
+            {compileResult
+              ? compileResult.compiled_successfully
+                ? "Compilation succeeded"
+                : "Compilation failed"
+              : "No compile run yet"}
+          </strong>
+        </div>
+
+        <div className="compiler-output">
+          <article>
+            <h4>Program output</h4>
+            <pre>{compileResult?.stdout || "Run the code to see stdout."}</pre>
+          </article>
+          <article>
+            <h4>Compiler / runtime messages</h4>
+            <pre>
+              {compileResult?.compile_stderr
+                || compileResult?.stderr
+                || "Compiler diagnostics and runtime stderr will appear here."}
+            </pre>
+          </article>
+        </div>
+      </div>
+    </Card>
+  );
+}
