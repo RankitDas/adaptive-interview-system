@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PropsWithChildren } from "react";
+import BugReportBar from "../BugReportBar";
 
 type LayoutProps = PropsWithChildren<{
   compact?: boolean;
@@ -33,6 +34,10 @@ export default function Layout({ children, compact = false }: LayoutProps) {
       </header>
 
       <main className={compact ? "page page-compact" : "page"}>{children}</main>
+
+      <div className="page page-full bug-report-wrap">
+        <BugReportBar />
+      </div>
 
       <footer className="site-footer">
         <span>Adaptive Interview System</span>

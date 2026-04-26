@@ -14,6 +14,8 @@ export default function FeedbackPanel({
   review,
   session,
 }: FeedbackPanelProps) {
+  const hasSessionData = session.answered_count > 0 || Boolean(result);
+
   return (
     <div className="feedback-grid">
       <Card className="fade-up">
@@ -69,30 +71,41 @@ export default function FeedbackPanel({
         <span className="eyebrow">Interviewer review</span>
         <h3>What the interviewer would say</h3>
 
-        <p className="coach-tip">{review.summary}</p>
+        {hasSessionData ? (
+          <>
+            <p className="coach-tip">{review.summary}</p>
 
-        <div className="insight-list">
-          <div>
-            <strong>Main problems</strong>
-            <ul>
-              {review.problems.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <strong>Improvements needed</strong>
-            <ul>
-              {review.improvements.map((item) => (
-                <li key={item}>{item}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
+            <div className="insight-list">
+              <div>
+                <strong>Main problems</strong>
+                <ul>
+                  {review.problems.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <strong>Improvements needed</strong>
+                <ul>
+                  {review.improvements.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
 
-        {review.malpractice_note ? (
-          <p className="error-inline">{review.malpractice_note}</p>
-        ) : null}
+            {review.malpractice_note ? (
+              <p className="error-inline">{review.malpractice_note}</p>
+            ) : null}
+          </>
+        ) : (
+          <div className="empty-state-card">
+            <strong>Review unlocks after the first answer.</strong>
+            <p className="muted-copy">
+              Start the interview and submit one original answer to get interviewer-style problems, improvements, and round feedback here.
+            </p>
+          </div>
+        )}
       </Card>
 
       <Card className="fade-up">

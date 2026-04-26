@@ -23,6 +23,7 @@ export default function InterviewPage() {
     currentTimeLimit,
     elapsed,
     error,
+    expectedOutput,
     isCompiling,
     isLoadingQuestion,
     isSessionActive,
@@ -38,6 +39,7 @@ export default function InterviewPage() {
     stdin,
     setAnswer,
     setCode,
+    setExpectedOutput,
     setMode,
     setPersonality,
     setRoundType,
@@ -175,12 +177,14 @@ export default function InterviewPage() {
                 code={code}
                 compileResult={compilerResult}
                 explanation={answer}
+                expectedOutput={expectedOutput}
                 isCompiling={isCompiling}
                 isSubmitting={isSubmitting}
                 lineCount={answerMetrics.lineCount}
                 onCodeChange={setCode}
                 onCompile={compileCurrentCode}
                 onExplanationChange={setAnswer}
+                onExpectedOutputChange={setExpectedOutput}
                 onPasteBlocked={reportPasteBlocked}
                 onStdinChange={setStdin}
                 onSubmit={submitCurrentAnswer}

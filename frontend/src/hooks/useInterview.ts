@@ -87,6 +87,7 @@ export function useInterview() {
   const [questionResponse, setQuestionResponse] = useState<NextQuestionResponse | null>(null);
   const [answer, setAnswer] = useState("");
   const [code, setCode] = useState(starterCode);
+  const [expectedOutput, setExpectedOutput] = useState("");
   const [stdin, setStdin] = useState("");
   const [roundType, setRoundType] = useState<InterviewRound>("theory");
   const [personality, setPersonality] = useState<InterviewPersonality>("normal");
@@ -263,6 +264,7 @@ export function useInterview() {
 
         if (next.round_type === "coding") {
           setCode(starterCode);
+          setExpectedOutput("");
           setStdin("");
         }
       });
@@ -352,9 +354,13 @@ export function useInterview() {
     setError(null);
 
     try {
+      const answerPayload = activeRound === "coding" && expectedOutput.trim()
+        ? `${answer}\n\nExpected output or behavior:\n${expectedOutput}`
+        : answer;
+
       const response = await submitAnswer({
         question_id: questionResponse.question.id,
-        answer,
+        answer: answerPayload,
         response_time: elapsed,
         time_limit: currentTimeLimit,
         round_type: activeRound,
@@ -406,6 +412,7 @@ export function useInterview() {
         setQuestionResponse(null);
         setAnswer("");
         setCode(starterCode);
+        setExpectedOutput("");
         setStdin("");
         setElapsed(0);
         setResult(null);
@@ -439,6 +446,7 @@ export function useInterview() {
     currentTimeLimit,
     elapsed,
     error,
+    expectedOutput,
     isCompiling,
     isLoadingQuestion,
     isSessionActive,
@@ -454,6 +462,7 @@ export function useInterview() {
     stdin,
     setAnswer,
     setCode,
+    setExpectedOutput,
     setMode,
     setPersonality,
     setRoundType,

@@ -8,6 +8,7 @@ import Card from "./ui/Card";
 type CodingWorkspaceProps = {
   code: string;
   explanation: string;
+  expectedOutput: string;
   stdin: string;
   compileResult: CompileResponse | null;
   isCompiling: boolean;
@@ -16,6 +17,7 @@ type CodingWorkspaceProps = {
   onCodeChange: (value: string) => void;
   onCompile: () => void;
   onExplanationChange: (value: string) => void;
+  onExpectedOutputChange: (value: string) => void;
   onPasteBlocked: () => void;
   onStdinChange: (value: string) => void;
   onSubmit: () => void;
@@ -24,6 +26,7 @@ type CodingWorkspaceProps = {
 export default function CodingWorkspace({
   code,
   explanation,
+  expectedOutput,
   stdin,
   compileResult,
   isCompiling,
@@ -32,6 +35,7 @@ export default function CodingWorkspace({
   onCodeChange,
   onCompile,
   onExplanationChange,
+  onExpectedOutputChange,
   onPasteBlocked,
   onStdinChange,
   onSubmit,
@@ -103,6 +107,28 @@ export default function CodingWorkspace({
             placeholder="Describe the approach, time complexity, and edge cases..."
             value={explanation}
             onChange={(event) => onExplanationChange(event.target.value)}
+            onDrop={(event) => {
+              event.preventDefault();
+              onPasteBlocked();
+            }}
+            onKeyDown={blockPasteShortcut}
+            onPaste={(event) => {
+              event.preventDefault();
+              onPasteBlocked();
+            }}
+          />
+        </div>
+
+        <div className="coding-side-panel">
+          <label className="field-label" htmlFor="expected-output-input">
+            Expected output
+          </label>
+          <textarea
+            id="expected-output-input"
+            className="mini-textarea"
+            placeholder="Write the expected output or expected behavior for the solution..."
+            value={expectedOutput}
+            onChange={(event) => onExpectedOutputChange(event.target.value)}
             onDrop={(event) => {
               event.preventDefault();
               onPasteBlocked();

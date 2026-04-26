@@ -14,6 +14,7 @@ export default function AtsPage() {
   const [result, setResult] = useState<AtsResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [comingSoonMessage, setComingSoonMessage] = useState<string | null>(null);
 
   async function handleAnalyze() {
     setIsAnalyzing(true);
@@ -31,6 +32,7 @@ export default function AtsPage() {
 
       const response = await evaluateResume(formData);
       setResult(response);
+      setComingSoonMessage(null);
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -144,19 +146,42 @@ export default function AtsPage() {
 
               <div className="stat-grid stat-grid-two">
                 <article>
-                  <strong>{result.semantic_similarity}%</strong>
-                  <span>semantic similarity</span>
+                  <strong>
+                    {result.semantic_engine === "sentence-transformers"
+                      ? `${result.semantic_similarity}%`
+                      : "Soon"}
+                  </strong>
+                  <span>
+                    {result.semantic_engine === "sentence-transformers"
+                      ? "semantic similarity"
+                      : "semantic AI score"}
+                  </span>
                 </article>
-                <article>
-                  <strong>{result.semantic_engine}</strong>
-                  <span>matching engine</span>
-                </article>
+                {result.semantic_engine === "sentence-transformers" ? (
+                  <article>
+                    <strong>Live</strong>
+                    <span>AI matching active</span>
+                  </article>
+                ) : (
+                  <button
+                    className="coming-soon-card"
+                    onClick={() => setComingSoonMessage("Semantic AI ATS scoring is coming soon. The current result uses skills and content similarity first.")}
+                    type="button"
+                  >
+                    <strong>Coming soon</strong>
+                    <span>semantic AI matching</span>
+                  </button>
+                )}
               </div>
+
+              {comingSoonMessage ? (
+                <p className="info-banner">{comingSoonMessage}</p>
+              ) : null}
 
               <div className="insight-list">
                 <div>
                   <strong>Found skills</strong>
-                  <ul>
+                  <ul className="chip-list">
                     {result.found_skills.length > 0 ? (
                       result.found_skills.map((item) => <li key={item}>{item}</li>)
                     ) : (
@@ -166,7 +191,7 @@ export default function AtsPage() {
                 </div>
                 <div>
                   <strong>Missing skills</strong>
-                  <ul>
+                  <ul className="chip-list">
                     {result.missing_skills.length > 0 ? (
                       result.missing_skills.map((item) => <li key={item}>{item}</li>)
                     ) : (

@@ -1,3 +1,4 @@
+import re
 from typing import Optional
 
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
@@ -183,7 +184,8 @@ async def evaluate_resume(
         raise HTTPException(status_code=400, detail="Provide either resume text or a resume file.")
 
     skills = [
-        skill.strip() for skill in required_skills.split(",")
+        skill.strip()
+        for skill in re.split(r"[\n,;|]+", required_skills)
         if skill.strip()
     ]
 
