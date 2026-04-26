@@ -6,7 +6,7 @@
   },
   {
     "id": 2,
-    "question": "Explain quicksort time complexity.",
+    "question": "Explain time complexity of quicksort.",
     "difficulty": "medium"
   },
   {
