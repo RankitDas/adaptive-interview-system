@@ -10,7 +10,8 @@ import {
 } from "../types";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://127.0.0.1:8000";
+  process.env.NEXT_PUBLIC_API_BASE_URL ??
+  "https://adaptive-interview-system.onrender.com";
 
 function normalizeApiError(message: string, status: number, path: string) {
   const lowerMessage = message.toLowerCase();
