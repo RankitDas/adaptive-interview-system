@@ -6,6 +6,10 @@ import Card from "../../components/ui/Card";
 import { evaluateResume } from "../../services/api";
 import { AtsResponse } from "../../types";
 
+function formatPercent(value: number) {
+  return `${value.toFixed(1)}%`;
+}
+
 export default function AtsPage() {
   const [resumeText, setResumeText] = useState("");
   const [jobDescription, setJobDescription] = useState("");
@@ -14,7 +18,8 @@ export default function AtsPage() {
   const [result, setResult] = useState<AtsResponse | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [comingSoonMessage, setComingSoonMessage] = useState<string | null>(null);
+  const hasLargeInputAdjustment =
+    Boolean(result?.resume_truncated) || Boolean(result?.job_description_truncated);
 
   async function handleAnalyze() {
     setIsAnalyzing(true);
@@ -32,7 +37,6 @@ export default function AtsPage() {
 
       const response = await evaluateResume(formData);
       setResult(response);
-      setComingSoonMessage(null);
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -49,9 +53,9 @@ export default function AtsPage() {
       <section className="interview-header fade-up">
         <div>
           <span className="eyebrow">ATS checker</span>
-          <h1>Live resume matching workspace.</h1>
+          <h1>Resume matching workspace.</h1>
           <p>
-            Paste resume text or upload a resume file, add the job description and required skills, and score the match directly inside the site.
+            Paste resume text or upload a file, add the target role, and get a clear match breakdown without exposing internal processing details.
           </p>
         </div>
       </section>
@@ -59,7 +63,10 @@ export default function AtsPage() {
       <div className="ats-grid">
         <Card className="fade-up">
           <span className="eyebrow">Resume input</span>
-          <h3>Upload or paste</h3>
+          <div className="panel-topline">
+            <h3>Upload or paste</h3>
+            <span className="status-badge status-badge-live">Live</span>
+          </div>
 
           <label className="field-label" htmlFor="resume-file">
             Resume file (PDF, DOCX, or TXT)
@@ -67,6 +74,7 @@ export default function AtsPage() {
           <input
             id="resume-file"
             className="file-input"
+            accept=".pdf,.docx,.txt"
             onChange={(event) => setResumeFile(event.target.files?.[0] ?? null)}
             type="file"
           />
@@ -86,7 +94,10 @@ export default function AtsPage() {
 
         <Card className="fade-up">
           <span className="eyebrow">Job target</span>
-          <h3>Role description</h3>
+          <div className="panel-topline">
+            <h3>Role description</h3>
+            <span className="status-badge status-badge-live">Live</span>
+          </div>
 
           <label className="field-label" htmlFor="job-description">
             Job description
@@ -110,6 +121,9 @@ export default function AtsPage() {
             value={requiredSkills}
             onChange={(event) => setRequiredSkills(event.target.value)}
           />
+          <p className="muted-copy">
+            Leave this blank if you want the checker to infer target skills from the job description.
+          </p>
 
           <button
             className="button button-primary"
@@ -125,67 +139,91 @@ export default function AtsPage() {
 
         <Card className="fade-up">
           <span className="eyebrow">ATS result</span>
-          <h3>Match breakdown</h3>
+          <div className="panel-topline">
+            <h3>Match breakdown</h3>
+            <span className="status-badge status-badge-live">Live</span>
+          </div>
 
           {result ? (
             <>
               <div className="stat-grid">
                 <article>
-                  <strong>{result.overall_match}%</strong>
-                  <span>overall match</span>
+                  <strong>{formatPercent(result.overall_match)}</strong>
+                  <span>dynamic ATS score</span>
                 </article>
                 <article>
-                  <strong>{result.hard_skills_match}%</strong>
-                  <span>hard skills match</span>
+                  <strong>{formatPercent(result.skill_alignment_score)}</strong>
+                  <span>skill evidence score</span>
                 </article>
                 <article>
-                  <strong>{result.content_similarity}%</strong>
+                  <strong>{formatPercent(result.hard_skills_match)}</strong>
+                  <span>skill coverage</span>
+                </article>
+                <article>
+                  <strong>{formatPercent(result.content_similarity)}</strong>
                   <span>content similarity</span>
                 </article>
               </div>
 
               <div className="stat-grid stat-grid-two">
                 <article>
-                  <strong>
-                    {result.semantic_engine === "sentence-transformers"
-                      ? `${result.semantic_similarity}%`
-                      : "Soon"}
-                  </strong>
+                  <strong>{formatPercent(result.semantic_similarity)}</strong>
                   <span>
                     {result.semantic_engine === "sentence-transformers"
-                      ? "semantic similarity"
-                      : "semantic AI score"}
+                      ? "semantic meaning score"
+                      : "keyword overlap score"}
                   </span>
                 </article>
-                {result.semantic_engine === "sentence-transformers" ? (
-                  <article>
-                    <strong>Live</strong>
-                    <span>AI matching active</span>
-                  </article>
-                ) : (
-                  <button
-                    className="coming-soon-card"
-                    onClick={() => setComingSoonMessage("Semantic AI ATS scoring is coming soon. The current result uses skills and content similarity first.")}
-                    type="button"
-                  >
-                    <strong>Coming soon</strong>
-                    <span>semantic AI matching</span>
-                  </button>
-                )}
+                <article>
+                  <strong>
+                    {result.matched_skill_count}/{result.total_skill_count}
+                  </strong>
+                  <span>
+                    {result.skill_source === "required_skills"
+                      ? "required skills matched"
+                      : result.skill_source === "role_bank"
+                        ? "role-bank skills matched"
+                      : result.skill_source === "job_description"
+                        ? "JD skills matched"
+                        : "skills available"}
+                  </span>
+                </article>
               </div>
 
-              {comingSoonMessage ? (
-                <p className="info-banner">{comingSoonMessage}</p>
+              <p className="info-banner">
+                {result.skill_source === "required_skills"
+                  ? "Scored from the required skills list, with higher weight on the skills emphasized in the job description."
+                  : result.skill_source === "role_bank"
+                    ? "Required skills were empty, so the ATS checker used the closest role skill bank plus the job description."
+                  : result.skill_source === "job_description"
+                    ? "Required skills were empty, so the ATS checker inferred target skills from the job description first."
+                    : "No strong skill list was available, so this score leaned more on content alignment."}
+              </p>
+
+              {hasLargeInputAdjustment ? (
+                <p className="info-banner">
+                  Large input was safely shortened behind the scenes so scoring stays stable.
+                </p>
               ) : null}
 
               <div className="insight-list">
+                <div>
+                  <strong>Target skills</strong>
+                  <ul className="chip-list">
+                    {result.target_skills.length > 0 ? (
+                      result.target_skills.map((item) => <li key={item}>{item}</li>)
+                    ) : (
+                      <li>Add required skills or a richer job description.</li>
+                    )}
+                  </ul>
+                </div>
                 <div>
                   <strong>Found skills</strong>
                   <ul className="chip-list">
                     {result.found_skills.length > 0 ? (
                       result.found_skills.map((item) => <li key={item}>{item}</li>)
                     ) : (
-                      <li>No required skills matched yet.</li>
+                      <li>No target skills matched yet.</li>
                     )}
                   </ul>
                 </div>
@@ -195,7 +233,7 @@ export default function AtsPage() {
                     {result.missing_skills.length > 0 ? (
                       result.missing_skills.map((item) => <li key={item}>{item}</li>)
                     ) : (
-                      <li>No required skills are missing.</li>
+                      <li>No target skills are missing.</li>
                     )}
                   </ul>
                 </div>
@@ -208,6 +246,11 @@ export default function AtsPage() {
               Add the resume and job details, then run the ATS analysis to see the score breakdown here.
             </p>
           )}
+
+          <div className="coming-soon-card coming-soon-card-compact" aria-disabled="true">
+            <strong>PDF export and batch resume comparison</strong>
+            <span>Coming soon</span>
+          </div>
         </Card>
       </div>
     </Layout>

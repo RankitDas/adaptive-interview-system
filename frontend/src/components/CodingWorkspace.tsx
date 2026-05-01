@@ -12,6 +12,7 @@ type CodingWorkspaceProps = {
   stdin: string;
   compileResult: CompileResponse | null;
   isCompiling: boolean;
+  isLocked: boolean;
   isSubmitting: boolean;
   lineCount: number;
   onCodeChange: (value: string) => void;
@@ -30,6 +31,7 @@ export default function CodingWorkspace({
   stdin,
   compileResult,
   isCompiling,
+  isLocked,
   isSubmitting,
   lineCount,
   onCodeChange,
@@ -69,6 +71,7 @@ export default function CodingWorkspace({
 
       <textarea
         className="code-editor"
+        disabled={isLocked}
         spellCheck={false}
         value={code}
         onChange={(event) => onCodeChange(event.target.value)}
@@ -91,6 +94,7 @@ export default function CodingWorkspace({
           <textarea
             id="stdin-input"
             className="mini-textarea"
+            disabled={isLocked}
             placeholder="Optional stdin for your program..."
             value={stdin}
             onChange={(event) => onStdinChange(event.target.value)}
@@ -104,6 +108,7 @@ export default function CodingWorkspace({
           <textarea
             id="explanation-input"
             className="mini-textarea"
+            disabled={isLocked}
             placeholder="Describe the approach, time complexity, and edge cases..."
             value={explanation}
             onChange={(event) => onExplanationChange(event.target.value)}
@@ -126,6 +131,7 @@ export default function CodingWorkspace({
           <textarea
             id="expected-output-input"
             className="mini-textarea"
+            disabled={isLocked}
             placeholder="Write the expected output or expected behavior for the solution..."
             value={expectedOutput}
             onChange={(event) => onExpectedOutputChange(event.target.value)}
@@ -143,16 +149,16 @@ export default function CodingWorkspace({
       </div>
 
       <div className="compiler-actions">
-        <Button onClick={onCompile} disabled={!code.trim() || isCompiling} type="button">
+        <Button onClick={onCompile} disabled={!code.trim() || isCompiling || isLocked} type="button">
           {isCompiling ? "Compiling..." : "Compile & run"}
         </Button>
         <Button
           onClick={onSubmit}
-          disabled={!code.trim() || isSubmitting}
+          disabled={!code.trim() || isSubmitting || isLocked}
           type="button"
           variant="success"
         >
-          {isSubmitting ? "Submitting..." : "Submit coding answer"}
+          {isLocked ? "Answer submitted" : isSubmitting ? "Submitting..." : "Submit coding answer"}
         </Button>
       </div>
 

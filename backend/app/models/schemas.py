@@ -108,10 +108,23 @@ class CompileResponse(BaseModel):
 class AtsResponse(BaseModel):
     overall_match: float
     hard_skills_match: float
+    skill_alignment_score: float
     content_similarity: float
     semantic_similarity: float
+    target_skills: List[str]
     found_skills: List[str]
     missing_skills: List[str]
+    matched_skill_count: int
+    total_skill_count: int
+    skill_source: str
     suggestion: str
     parsed_resume_length: int
+    resume_token_count: int
+    job_description_token_count: int
+    analyzed_resume_tokens: int
+    analyzed_job_description_tokens: int
+    resume_truncated: bool
+    job_description_truncated: bool
+    scoring_weights: Dict[str, float]
     semantic_engine: str
+    skill_mentions: Dict[str, int]

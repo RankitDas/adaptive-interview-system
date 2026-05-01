@@ -312,6 +312,11 @@ export function useInterview() {
   }
 
   async function compileCurrentCode() {
+    if (!isSessionActive) {
+      setSessionMessage("Load the next question before compiling again.");
+      return;
+    }
+
     if (!code.trim()) {
       setSessionMessage("Write your own code before compiling.");
       return;
@@ -346,7 +351,7 @@ export function useInterview() {
     const hasTheoryAnswer = activeRound === "theory" && answer.trim().length > 0;
     const hasCodingAnswer = activeRound === "coding" && code.trim().length > 0;
 
-    if (!questionResponse?.question || (!hasTheoryAnswer && !hasCodingAnswer)) {
+    if (!isSessionActive || !questionResponse?.question || (!hasTheoryAnswer && !hasCodingAnswer)) {
       return;
     }
 

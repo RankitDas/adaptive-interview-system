@@ -1,39 +1,14 @@
 "use client";
 
-import { KeyboardEvent, useEffect, useRef, useState } from "react";
+import { KeyboardEvent } from "react";
 import Button from "./ui/Button";
 import Card from "./ui/Card";
 import { InterviewMode } from "../types";
 
-declare global {
-  interface Window {
-    SpeechRecognition?: new () => SpeechRecognitionInstance;
-    webkitSpeechRecognition?: new () => SpeechRecognitionInstance;
-  }
-}
-
-type SpeechRecognitionInstance = {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start: () => void;
-  stop: () => void;
-  onresult: ((event: SpeechRecognitionEventShape) => void) | null;
-  onend: (() => void) | null;
-  onerror: (() => void) | null;
-};
-
-type SpeechRecognitionEventShape = {
-  results: ArrayLike<{
-    0: {
-      transcript: string;
-    };
-  }>;
-};
-
 type AnswerBoxProps = {
   answer: string;
   estimatedScore: number;
+  isLocked: boolean;
   isSubmitting: boolean;
   mode: InterviewMode;
   onAnswerChange: (value: string) => void;
@@ -46,6 +21,7 @@ type AnswerBoxProps = {
 export default function AnswerBox({
   answer,
   estimatedScore,
+  isLocked,
   isSubmitting,
   mode,
   onAnswerChange,
@@ -54,64 +30,6 @@ export default function AnswerBox({
   onSubmit,
   wordCount,
 }: AnswerBoxProps) {
-  const recognitionRef = useRef<SpeechRecognitionInstance | null>(null);
-  const [isListening, setIsListening] = useState(false);
-  const [voiceSupported, setVoiceSupported] = useState(false);
-
-  useEffect(() => {
-    const SpeechRecognition =
-      window.SpeechRecognition ?? window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-      return;
-    }
-
-    setVoiceSupported(true);
-
-    const recognition = new SpeechRecognition();
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.lang = "en-US";
-
-    recognition.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map((result) => result[0].transcript)
-        .join(" ");
-
-      onAnswerChange(transcript.trim());
-    };
-
-    recognition.onend = () => {
-      setIsListening(false);
-    };
-
-    recognition.onerror = () => {
-      setIsListening(false);
-    };
-
-    recognitionRef.current = recognition;
-
-    return () => {
-      recognition.stop();
-      recognitionRef.current = null;
-    };
-  }, [onAnswerChange]);
-
-  function toggleListening() {
-    if (!recognitionRef.current) {
-      return;
-    }
-
-    if (isListening) {
-      recognitionRef.current.stop();
-      setIsListening(false);
-      return;
-    }
-
-    recognitionRef.current.start();
-    setIsListening(true);
-  }
-
   function blockPasteShortcut(event: KeyboardEvent<HTMLTextAreaElement>) {
     const isPasteShortcut =
       ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "v")
@@ -136,46 +54,30 @@ export default function AnswerBox({
         <div className="segmented-control">
           <button
             className={mode === "text" ? "is-active" : ""}
+            disabled={isLocked}
             onClick={() => onModeChange("text")}
             type="button"
           >
             Type
           </button>
           <button
-            className={mode === "voice" ? "is-active" : ""}
-            onClick={() => onModeChange("voice")}
+            className="is-disabled"
+            disabled
+            title="Voice scoring is planned and will be added later."
             type="button"
           >
-            Voice
+            Voice - soon
           </button>
         </div>
       </div>
 
-      {mode === "voice" && voiceSupported ? (
-        <div className="voice-panel">
-          <p>
-            Browser speech capture is active here so you can rehearse delivery, but the final answer still stays inside this interview workspace.
-          </p>
-          <Button
-            onClick={toggleListening}
-            variant={isListening ? "danger" : "secondary"}
-            type="button"
-          >
-            {isListening ? "Stop listening" : "Start voice capture"}
-          </Button>
-        </div>
-      ) : null}
-
-      {mode === "voice" && !voiceSupported ? (
-        <div className="voice-panel">
-          <p>
-            Voice capture is not available in this browser. You can still type your answer and rehearse aloud.
-          </p>
-        </div>
-      ) : null}
+      <div className="inline-callout inline-callout-subtle">
+        Voice scoring is coming soon. The active interview flow uses typed answers so integrity checks stay consistent.
+      </div>
 
       <textarea
         className="answer-box__textarea"
+        disabled={isLocked}
         placeholder="Frame your answer with a clear opening, reasoning, and one concrete example..."
         rows={8}
         value={answer}
@@ -196,16 +98,16 @@ export default function AnswerBox({
           <div className="quality-meter__track">
             <span style={{ width: `${estimatedScore}%` }} />
           </div>
-          <small>{wordCount} words · answer readiness {estimatedScore}%</small>
+          <small>{wordCount} words - answer readiness {estimatedScore}%</small>
         </div>
 
         <Button
-          disabled={!answer.trim() || isSubmitting}
+          disabled={!answer.trim() || isSubmitting || isLocked}
           onClick={onSubmit}
           type="button"
           variant="success"
         >
-          {isSubmitting ? "Submitting..." : "Submit answer"}
+          {isLocked ? "Answer submitted" : isSubmitting ? "Submitting..." : "Submit answer"}
         </Button>
       </div>
     </Card>

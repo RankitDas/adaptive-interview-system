@@ -4,7 +4,7 @@ import "../styles/globals.css";
 export const metadata: Metadata = {
   title: "Adaptive Interview System",
   description:
-    "A polished adaptive interview simulator with live coaching, voice practice, and session feedback.",
+    "A polished adaptive interview simulator with coding rounds, ATS scoring, and session feedback.",
 };
 
 export default function RootLayout({

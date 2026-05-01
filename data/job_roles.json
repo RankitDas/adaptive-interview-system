@@ -1,0 +1,76 @@
+{
+  "job_roles": [
+    {
+      "role": "Full Stack Java Developer",
+      "keywords": ["Java", "Spring Boot", "Hibernate", "REST API", "Microservices", "JPA", "SQL", "MySQL", "PostgreSQL", "HTML", "CSS", "JavaScript", "React", "Angular", "Git", "Docker", "Kubernetes", "CI/CD", "AWS"],
+      "experience_level": ["fresher", "junior", "mid", "senior"],
+      "education": ["B.Tech", "MCA", "BCA"],
+      "soft_skills": ["Problem Solving", "Teamwork", "Communication"],
+      "tools": ["IntelliJ", "Eclipse", "VS Code"],
+      "bonus_skills": ["GraphQL", "Redis", "Kafka"]
+    },
+    {
+      "role": "Full Stack Python Developer",
+      "keywords": ["Python", "Django", "Flask", "FastAPI", "REST API", "Microservices", "HTML", "CSS", "JavaScript", "React", "SQL", "PostgreSQL", "MongoDB", "Git", "Docker", "CI/CD", "AWS"],
+      "experience_level": ["fresher", "junior", "mid", "senior"],
+      "education": ["B.Tech", "MCA", "BCA"],
+      "soft_skills": ["Analytical Thinking", "Communication", "Teamwork"],
+      "tools": ["VS Code", "PyCharm"],
+      "bonus_skills": ["Machine Learning", "TensorFlow", "Pandas"]
+    },
+    {
+      "role": "Full Stack DevOps Engineer",
+      "keywords": ["Linux", "Shell Scripting", "Docker", "Kubernetes", "CI/CD", "Jenkins", "GitHub Actions", "AWS", "Azure", "GCP", "Terraform", "Ansible", "Monitoring", "Prometheus", "Grafana"],
+      "experience_level": ["junior", "mid", "senior"],
+      "education": ["B.Tech", "MCA"],
+      "soft_skills": ["Problem Solving", "Automation Mindset", "Collaboration"],
+      "tools": ["Docker", "Kubernetes", "Jenkins"],
+      "bonus_skills": ["Security", "SRE", "Chaos Engineering"]
+    },
+    {
+      "role": "Frontend Developer",
+      "keywords": ["HTML", "CSS", "JavaScript", "React", "Angular", "Vue", "Responsive Design", "UI/UX", "Tailwind CSS", "Git", "REST API"],
+      "experience_level": ["fresher", "junior", "mid"],
+      "education": ["B.Tech", "BCA"],
+      "soft_skills": ["Creativity", "Attention to Detail"],
+      "tools": ["VS Code", "Figma"],
+      "bonus_skills": ["Next.js", "TypeScript"]
+    },
+    {
+      "role": "Backend Developer",
+      "keywords": ["Java", "Python", "Node.js", "Spring Boot", "Django", "Express", "REST API", "GraphQL", "SQL", "NoSQL", "MongoDB", "Authentication", "JWT", "Git", "Docker"],
+      "experience_level": ["junior", "mid", "senior"],
+      "education": ["B.Tech", "MCA"],
+      "soft_skills": ["Logical Thinking", "Problem Solving"],
+      "tools": ["Postman", "VS Code"],
+      "bonus_skills": ["Microservices", "Caching", "Redis"]
+    },
+    {
+      "role": "Data Scientist",
+      "keywords": ["Python", "Pandas", "NumPy", "Scikit-learn", "Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "Data Analysis", "Statistics", "SQL", "Data Visualization"],
+      "experience_level": ["junior", "mid", "senior"],
+      "education": ["B.Tech", "M.Sc", "PhD"],
+      "soft_skills": ["Analytical Thinking", "Problem Solving"],
+      "tools": ["Jupyter Notebook", "VS Code"],
+      "bonus_skills": ["Big Data", "Spark"]
+    },
+    {
+      "role": "Mobile App Developer",
+      "keywords": ["Android", "iOS", "Flutter", "React Native", "Java", "Kotlin", "Swift", "REST API", "Firebase"],
+      "experience_level": ["fresher", "junior", "mid"],
+      "education": ["B.Tech", "BCA"],
+      "soft_skills": ["Creativity", "Problem Solving"],
+      "tools": ["Android Studio", "Xcode"],
+      "bonus_skills": ["Cross-platform", "UI/UX"]
+    },
+    {
+      "role": "AI/ML Engineer",
+      "keywords": ["Python", "Machine Learning", "Deep Learning", "TensorFlow", "PyTorch", "NLP", "Computer Vision", "Data Preprocessing", "Model Deployment"],
+      "experience_level": ["junior", "mid", "senior"],
+      "education": ["B.Tech", "M.Tech", "PhD"],
+      "soft_skills": ["Research Skills", "Analytical Thinking"],
+      "tools": ["Jupyter", "VS Code"],
+      "bonus_skills": ["MLOps", "Cloud AI"]
+    }
+  ]
+}

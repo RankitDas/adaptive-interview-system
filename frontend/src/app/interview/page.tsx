@@ -137,7 +137,7 @@ export default function InterviewPage() {
             </article>
           </div>
           <p className="muted-copy">
-            After 5 warnings the interview is terminated and the site will show “Stop malpractice during interview.”
+            After 5 warnings the interview is terminated and the site will show "Stop malpractice during interview."
           </p>
         </Card>
 
@@ -180,6 +180,7 @@ export default function InterviewPage() {
                 expectedOutput={expectedOutput}
                 isCompiling={isCompiling}
                 isSubmitting={isSubmitting}
+                isLocked={!isSessionActive}
                 lineCount={answerMetrics.lineCount}
                 onCodeChange={setCode}
                 onCompile={compileCurrentCode}
@@ -195,6 +196,7 @@ export default function InterviewPage() {
                 answer={answer}
                 estimatedScore={answerMetrics.estimatedScore}
                 isSubmitting={isSubmitting}
+                isLocked={!isSessionActive}
                 mode={mode}
                 onAnswerChange={setAnswer}
                 onModeChange={setMode}

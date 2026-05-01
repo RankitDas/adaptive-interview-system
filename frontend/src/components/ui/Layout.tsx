@@ -9,12 +9,11 @@ type LayoutProps = PropsWithChildren<{
 export default function Layout({ children, compact = false }: LayoutProps) {
   return (
     <div className="app-shell">
-      <div className="app-shell__glow app-shell__glow-left" />
-      <div className="app-shell__glow app-shell__glow-right" />
-
       <div className="utility-bar">
-        <span>Interview integrity is active: answer pasting is blocked and tab switches are tracked.</span>
-        <a href="mailto:dasrankit2018@gmail.com">Report bugs: dasrankit2018@gmail.com</a>
+        <span>
+          <span className="status-dot" /> Integrity guard active: paste blocking and tab tracking are enabled.
+        </span>
+        <a href="mailto:dasrankit2018@gmail.com">Report a bug</a>
       </div>
 
       <header className="site-header">
@@ -22,7 +21,7 @@ export default function Layout({ children, compact = false }: LayoutProps) {
           <span className="brand-mark__pill">AI</span>
           <span>
             Adaptive Interview
-            <small>Practice with adaptive pressure, feedback, and flow.</small>
+            <small>Interview practice, coding rounds, ATS scoring.</small>
           </span>
         </Link>
 

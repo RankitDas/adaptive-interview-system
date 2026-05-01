@@ -1,5 +1,15 @@
 __pycache__/
 *.pyc
-venv/
-node_modules/
+*.pyo
+*.log
+*.err
 .env
+.env.local
+
+backend/.packages/
+backend/.venv/
+backend/venv/
+frontend/.next/
+frontend/node_modules/
+node_modules/
+venv/

@@ -116,13 +116,26 @@ export type CompileResponse = {
 export type AtsResponse = {
   overall_match: number;
   hard_skills_match: number;
+  skill_alignment_score: number;
   content_similarity: number;
   semantic_similarity: number;
+  target_skills: string[];
   found_skills: string[];
   missing_skills: string[];
+  matched_skill_count: number;
+  total_skill_count: number;
+  skill_source: "required_skills" | "role_bank" | "job_description" | "content_only";
   suggestion: string;
   parsed_resume_length: number;
+  resume_token_count: number;
+  job_description_token_count: number;
+  analyzed_resume_tokens: number;
+  analyzed_job_description_tokens: number;
+  resume_truncated: boolean;
+  job_description_truncated: boolean;
+  scoring_weights: Record<string, number>;
   semantic_engine: string;
+  skill_mentions: Record<string, number>;
 };
 
 export type StoredSessionReport = {

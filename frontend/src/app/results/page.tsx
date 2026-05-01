@@ -29,7 +29,10 @@ export default function ResultsPage() {
     <Layout compact>
       <section className="results-shell">
         <Card className="fade-up">
-          <span className="eyebrow">Last session</span>
+          <div className="panel-topline">
+            <span className="eyebrow">Last session</span>
+            <span className="status-badge status-badge-live">Local save</span>
+          </div>
           <h1>Interviewer review</h1>
 
           {report ? (
@@ -106,6 +109,9 @@ export default function ResultsPage() {
             <Link href="/ats" className="button button-secondary">
               Open ATS checker
             </Link>
+            <button className="button button-ghost" disabled type="button" title="Export will be added later.">
+              Export report - coming soon
+            </button>
           </div>
         </Card>
       </section>
