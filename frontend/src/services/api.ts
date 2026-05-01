@@ -9,91 +9,73 @@ import {
   SubmitAnswerResponse,
 } from "../types";
 
-/**
- * ✅ FINAL BASE URL FIX
- * Uses env if available, otherwise falls back to production backend
- */
+// ✅ Uses env in Vercel, falls back to Render URL
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL ||
   "https://adaptive-interview-system.onrender.com";
 
-/**
- * Normalize user-facing errors
- */
 function normalizeApiError(message: string, status: number, path: string) {
   const lower = message.toLowerCase();
 
   if (lower.includes("failed to fetch") || lower.includes("networkerror")) {
-    return "Backend unreachable. It may be waking up (Render free tier). Please wait a few seconds and try again.";
+    return "Backend may be waking up (Render). Please wait a few seconds and try again.";
   }
 
   if (status >= 500) {
-    if (path.includes("compile")) {
-      return "Compiler error. Please check your code.";
-    }
-
-    if (path.includes("ats")) {
-      return "Resume analysis failed. Try a smaller input.";
-    }
-
+    if (path.includes("compile")) return "Compiler error. Check your code.";
+    if (path.includes("ats")) return "Resume analysis failed. Try smaller input.";
     return "Server error. Please try again.";
-  }
-
-  if (lower.includes("request failed with status")) {
-    return "Request failed. Please check your input.";
   }
 
   return message;
 }
 
-/**
- * Core request wrapper
- */
+// ✅ Retry once (handles Render cold start)
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const isFormData = init?.body instanceof FormData;
 
-  try {
-    const response = await fetch(`${API_BASE_URL}${path}`, {
-      ...init,
-      headers: isFormData
-        ? init?.headers
-        : {
-            "Content-Type": "application/json",
-            ...(init?.headers || {}),
-          },
-      cache: "no-store",
-    });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(`${API_BASE_URL}${path}`, {
+        ...init,
+        headers: isFormData
+          ? init?.headers
+          : {
+              "Content-Type": "application/json",
+              ...(init?.headers || {}),
+            },
+        cache: "no-store",
+      });
 
-    if (!response.ok) {
-      let message = `Request failed (${response.status})`;
-
-      try {
-        const data = await response.json();
-        message = data?.detail || message;
-      } catch {
-        // ignore JSON parse error
+      if (!res.ok) {
+        let msg = `Request failed (${res.status})`;
+        try {
+          const data = await res.json();
+          msg = data?.detail || msg;
+        } catch {}
+        throw new Error(normalizeApiError(msg, res.status, path));
       }
 
-      throw new Error(normalizeApiError(message, response.status, path));
+      return res.json();
+    } catch (err) {
+      if (attempt === 1) {
+        throw new Error(
+          normalizeApiError(
+            err instanceof Error ? err.message : "Network error",
+            0,
+            path
+          )
+        );
+      }
+      // wait 2s then retry
+      await new Promise((r) => setTimeout(r, 2000));
     }
-
-    return response.json();
-  } catch (err) {
-    throw new Error(
-      normalizeApiError(
-        err instanceof Error ? err.message : "Network error",
-        0,
-        path
-      )
-    );
   }
+
+  throw new Error("Unexpected error");
 }
 
-/**
- * ======================
- * API FUNCTIONS
- * ======================
- */
+/* ===== API functions ===== */
 
 export function fetchNextQuestion(
   personality: InterviewPersonality,
