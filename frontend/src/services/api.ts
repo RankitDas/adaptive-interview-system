@@ -9,58 +9,29 @@ import {
   SubmitAnswerResponse,
 } from "../types";
 
-/**
- * ✅ API base URL (uses Vercel env, fallback to Render)
- */
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ||
-  "https://adaptive-interview-system.onrender.com";
+// 🔥 HARD CODED BACKEND URL (no env issues)
+const API_BASE_URL = "https://adaptive-interview-system.onrender.com";
 
-/**
- * Simple error normalizer
- */
-function normalizeApiError(message: string) {
-  const lower = message.toLowerCase();
-
-  if (lower.includes("failed to fetch") || lower.includes("networkerror")) {
-    return "Backend is waking up or unreachable. Please wait a few seconds and try again.";
-  }
-
-  return message;
-}
-
-/**
- * ✅ CLEAN request function (no credentials, proper CORS mode)
- */
+// ✅ Simple clean request function
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const isFormData = init?.body instanceof FormData;
-
   try {
     const res = await fetch(`${API_BASE_URL}${path}`, {
       ...init,
-      headers: isFormData
-        ? init?.headers
-        : {
-            "Content-Type": "application/json",
-            ...(init?.headers || {}),
-          },
+      headers: {
+        "Content-Type": "application/json",
+        ...(init?.headers || {}),
+      },
       mode: "cors",
-      cache: "no-store",
     });
 
     if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || `HTTP ${res.status}`);
+      throw new Error(`Request failed: ${res.status}`);
     }
 
     return res.json();
   } catch (err) {
     console.error("API ERROR:", err);
-    throw new Error(
-      normalizeApiError(
-        err instanceof Error ? err.message : "Network error"
-      )
-    );
+    throw new Error("Backend connection failed");
   }
 }
 

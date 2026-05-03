@@ -11,29 +11,32 @@ from app.api import interview
 
 app = FastAPI()
 
-# ✅ FINAL CORS (works with Vercel + local)
-# Note: when using "*", allow_credentials must be False
+# ✅ CLEAN CORS FIX (works with Vercel + local)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*"],   # allow all origins (important)
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# ✅ include routes
 app.include_router(interview.router)
 
 
+# ✅ root route
 @app.get("/")
 def root():
     return {"message": "Backend running"}
 
 
+# ✅ health check
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 
+# ✅ favicon fix
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     favicon_path = os.path.join(
@@ -48,7 +51,7 @@ async def favicon():
     return {"status": "favicon not available"}
 
 
-# Static files
+# ✅ static files (safe mount)
 static_dir = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "static"
