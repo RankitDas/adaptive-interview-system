@@ -11,32 +11,33 @@ from app.api import interview
 
 app = FastAPI()
 
-# ✅ CLEAN CORS FIX (works with Vercel + local)
+# 🔥 IMPORTANT: allow your Vercel domain + localhost
+# (replace YOUR-VERCEL-URL with your real URL if different)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # allow all origins (important)
-    allow_credentials=False,
+    allow_origins=[
+        "http://localhost:3000",
+        "https://adaptive-interview-system.vercel.app",
+        "https://adaptive-interview-system-git-main.vercel.app",
+    ],
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ✅ include routes
 app.include_router(interview.router)
 
 
-# ✅ root route
 @app.get("/")
 def root():
     return {"message": "Backend running"}
 
 
-# ✅ health check
 @app.get("/health")
 def health():
     return {"status": "ok"}
 
 
-# ✅ favicon fix
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
     favicon_path = os.path.join(
@@ -51,7 +52,6 @@ async def favicon():
     return {"status": "favicon not available"}
 
 
-# ✅ static files (safe mount)
 static_dir = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "static"
