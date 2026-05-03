@@ -11,29 +11,37 @@ import {
 
 const API_BASE_URL = "https://adaptive-interview-system.onrender.com";
 
-// ================= CORE REQUEST =================
+// ================= CORE REQUEST (WITH RETRY) =================
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
-  try {
-    const res = await fetch(API_BASE_URL + path, {
-      ...options,
-      headers: options?.body instanceof FormData
-        ? options.headers
-        : {
-            "Content-Type": "application/json",
-            ...(options?.headers || {}),
-          },
-    });
+  for (let attempt = 0; attempt < 2; attempt++) {
+    try {
+      const res = await fetch(API_BASE_URL + path, {
+        ...options,
+        headers: options?.body instanceof FormData
+          ? options.headers
+          : {
+              "Content-Type": "application/json",
+              ...(options?.headers || {}),
+            },
+      });
 
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(text || "API error");
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+
+      return await res.json();
+    } catch (err) {
+      if (attempt === 1) {
+        console.error("API ERROR:", err);
+        throw new Error("Backend connection failed");
+      }
+
+      // wait 2 sec then retry (handles Render sleep)
+      await new Promise((r) => setTimeout(r, 2000));
     }
-
-    return res.json();
-  } catch (err) {
-    console.error("API ERROR:", err);
-    throw new Error("Backend connection failed");
   }
+
+  throw new Error("Unexpected error");
 }
 
 // ================= INTERVIEW =================
@@ -64,7 +72,6 @@ export function getSessionReview() {
   return request<SessionActionResponse>("/session-review");
 }
 
-// ✅ ADD THIS (FIX ERROR)
 export function issueSessionWarning(reason: string) {
   return request<SessionActionResponse>("/session-warning", {
     method: "POST",
@@ -72,7 +79,6 @@ export function issueSessionWarning(reason: string) {
   });
 }
 
-// ✅ ADD THIS (SAFE)
 export function terminateSession(reason: string) {
   return request<SessionActionResponse>("/terminate-session", {
     method: "POST",
