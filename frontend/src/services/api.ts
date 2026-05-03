@@ -9,10 +9,9 @@ import {
   SubmitAnswerResponse,
 } from "../types";
 
-// 🔥 HARD CODED BACKEND URL (no env issues)
+// 🔥 HARD FIX: direct backend URL
 const API_BASE_URL = "https://adaptive-interview-system.onrender.com";
 
-// ✅ Simple clean request function
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     const res = await fetch(`${API_BASE_URL}${path}`, {
@@ -21,11 +20,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
         "Content-Type": "application/json",
         ...(init?.headers || {}),
       },
-      mode: "cors",
     });
 
     if (!res.ok) {
-      throw new Error(`Request failed: ${res.status}`);
+      const text = await res.text();
+      throw new Error(text);
     }
 
     return res.json();
