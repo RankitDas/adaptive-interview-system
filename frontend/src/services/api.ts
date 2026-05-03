@@ -1,75 +1,95 @@
+import {
+  AtsResponse,
+  CompileResponse,
+  InterviewPersonality,
+  InterviewRound,
+  NextQuestionResponse,
+  SessionActionResponse,
+  SubmitAnswerRequest,
+  SubmitAnswerResponse,
+} from "../types";
+
 const API_BASE_URL = "https://adaptive-interview-system.onrender.com";
 
 // ================= CORE REQUEST =================
-async function request(path: string, options?: RequestInit) {
+async function request<T>(path: string, options?: RequestInit): Promise<T> {
   try {
     const res = await fetch(API_BASE_URL + path, {
       ...options,
-      headers: {
-        "Content-Type": "application/json",
-        ...(options?.headers || {}),
-      },
+      headers: options?.body instanceof FormData
+        ? options.headers
+        : {
+            "Content-Type": "application/json",
+            ...(options?.headers || {}),
+          },
     });
 
     if (!res.ok) {
-      throw new Error("API error");
+      const text = await res.text();
+      throw new Error(text || "API error");
     }
 
-    return await res.json();
+    return res.json();
   } catch (err) {
-    console.error("ERROR:", err);
+    console.error("API ERROR:", err);
     throw new Error("Backend connection failed");
   }
 }
 
 // ================= INTERVIEW =================
 
-export function fetchNextQuestion(personality: string, roundType: string) {
-  return request(
-    `/next-question?personality=${personality}&round_type=${roundType}`
+export function fetchNextQuestion(
+  personality: InterviewPersonality,
+  roundType: InterviewRound
+) {
+  return request<NextQuestionResponse>(
+    `/next-question?personality=${encodeURIComponent(personality)}&round_type=${encodeURIComponent(roundType)}`
   );
 }
 
-export function submitAnswer(data: any) {
-  return request("/submit-answer", {
+export function submitAnswer(payload: SubmitAnswerRequest) {
+  return request<SubmitAnswerResponse>("/submit-answer", {
     method: "POST",
-    body: JSON.stringify(data),
+    body: JSON.stringify(payload),
   });
 }
 
 export function resetSession() {
-  return request("/reset-session", { method: "POST" });
+  return request<SessionActionResponse>("/reset-session", {
+    method: "POST",
+  });
+}
+
+export function issueSessionWarning(reason: string) {
+  return request<SessionActionResponse>("/session-warning", {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
+}
+
+export function terminateSession(reason: string) {
+  return request<SessionActionResponse>("/terminate-session", {
+    method: "POST",
+    body: JSON.stringify({ reason }),
+  });
 }
 
 export function getSessionReview() {
-  return request("/session-review");
+  return request<SessionActionResponse>("/session-review");
 }
 
-// ================= REQUIRED FIXES =================
+// ================= FIXED EXPORTS =================
 
-// ✅ FIX compileC (for coding feature)
 export function compileC(code: string, stdin = "") {
-  return request("/compile-c", {
+  return request<CompileResponse>("/compile-c", {
     method: "POST",
     body: JSON.stringify({ code, stdin }),
   });
 }
 
-// ✅ FIX evaluateResume (for ATS page)
-export async function evaluateResume(formData: FormData) {
-  try {
-    const res = await fetch(API_BASE_URL + "/ats/evaluate", {
-      method: "POST",
-      body: formData,
-    });
-
-    if (!res.ok) {
-      throw new Error("ATS error");
-    }
-
-    return await res.json();
-  } catch (err) {
-    console.error("ATS ERROR:", err);
-    throw new Error("Resume analysis failed");
-  }
+export function evaluateResume(formData: FormData) {
+  return request<AtsResponse>("/ats/evaluate", {
+    method: "POST",
+    body: formData,
+  });
 }
