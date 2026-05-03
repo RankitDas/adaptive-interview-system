@@ -11,20 +11,16 @@ from app.api import interview
 
 app = FastAPI()
 
-# 🔥 IMPORTANT: allow your Vercel domain + localhost
-# (replace YOUR-VERCEL-URL with your real URL if different)
+# ✅ OPEN CORS (works with Vercel + local)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://adaptive-interview-system.vercel.app",
-        "https://adaptive-interview-system-git-main.vercel.app",
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# include routes
 app.include_router(interview.router)
 
 
@@ -52,6 +48,7 @@ async def favicon():
     return {"status": "favicon not available"}
 
 
+# static files
 static_dir = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "static"
