@@ -60,6 +60,11 @@ export function resetSession() {
   });
 }
 
+export function getSessionReview() {
+  return request<SessionActionResponse>("/session-review");
+}
+
+// ✅ ADD THIS (FIX ERROR)
 export function issueSessionWarning(reason: string) {
   return request<SessionActionResponse>("/session-warning", {
     method: "POST",
@@ -67,6 +72,7 @@ export function issueSessionWarning(reason: string) {
   });
 }
 
+// ✅ ADD THIS (SAFE)
 export function terminateSession(reason: string) {
   return request<SessionActionResponse>("/terminate-session", {
     method: "POST",
@@ -74,11 +80,7 @@ export function terminateSession(reason: string) {
   });
 }
 
-export function getSessionReview() {
-  return request<SessionActionResponse>("/session-review");
-}
-
-// ================= FIXED EXPORTS =================
+// ================= EXTRA FEATURES =================
 
 export function compileC(code: string, stdin = "") {
   return request<CompileResponse>("/compile-c", {
