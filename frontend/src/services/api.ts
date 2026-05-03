@@ -1,12 +1,13 @@
 const API_BASE_URL = "https://adaptive-interview-system.onrender.com";
 
-// simple clean fetch
+// ================= CORE REQUEST =================
 async function request(path: string, options?: RequestInit) {
   try {
     const res = await fetch(API_BASE_URL + path, {
       ...options,
       headers: {
         "Content-Type": "application/json",
+        ...(options?.headers || {}),
       },
     });
 
@@ -21,7 +22,7 @@ async function request(path: string, options?: RequestInit) {
   }
 }
 
-// ================= API =================
+// ================= INTERVIEW =================
 
 export function fetchNextQuestion(personality: string, roundType: string) {
   return request(
@@ -42,4 +43,33 @@ export function resetSession() {
 
 export function getSessionReview() {
   return request("/session-review");
+}
+
+// ================= REQUIRED FIXES =================
+
+// ✅ FIX compileC (for coding feature)
+export function compileC(code: string, stdin = "") {
+  return request("/compile-c", {
+    method: "POST",
+    body: JSON.stringify({ code, stdin }),
+  });
+}
+
+// ✅ FIX evaluateResume (for ATS page)
+export async function evaluateResume(formData: FormData) {
+  try {
+    const res = await fetch(API_BASE_URL + "/ats/evaluate", {
+      method: "POST",
+      body: formData,
+    });
+
+    if (!res.ok) {
+      throw new Error("ATS error");
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error("ATS ERROR:", err);
+    throw new Error("Resume analysis failed");
+  }
 }
