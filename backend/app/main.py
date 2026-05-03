@@ -11,12 +11,12 @@ from app.api import interview
 
 app = FastAPI()
 
-# ✅ TEMP: allow all origins (fixes Vercel ↔ Render immediately)
-# (You can lock this down later to your Vercel URL)
+# ✅ FINAL CORS (works with Vercel + local)
+# Note: when using "*", allow_credentials must be False
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=False,  # keep False when using "*"
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -29,7 +29,6 @@ def root():
     return {"message": "Backend running"}
 
 
-# Optional: simple health endpoint
 @app.get("/health")
 def health():
     return {"status": "ok"}
@@ -42,8 +41,10 @@ async def favicon():
         "static",
         "favicon.svg"
     )
+
     if os.path.exists(favicon_path):
         return FileResponse(favicon_path, media_type="image/svg+xml")
+
     return {"status": "favicon not available"}
 
 
@@ -52,5 +53,6 @@ static_dir = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "static"
 )
+
 if os.path.exists(static_dir):
     app.mount("/static", StaticFiles(directory=static_dir), name="static")
